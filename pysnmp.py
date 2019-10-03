@@ -57,8 +57,8 @@ def desmonta_snmp(msg):
 	snmp_value_type = ord(msg_list[0])
 	snmp_value_length = ord(msg_list[1])
 	snmp_version = ord(msg_list[4])
-	snmp_community_length = ord(msg_list[6])
-	snmp_community = msg_list[7:7+int(snmp_community_length)]
+	snmp_community_length = ord(msg_list[7])
+	snmp_community = msg_list[8:8+int(snmp_community_length)]
 
 	snmp_pdu_size = ord(msg_list[8+int(snmp_community_length)+1])
 	snmp_requst_id = ord(msg_list[8+int(snmp_community_length)+4])
@@ -122,17 +122,17 @@ def send_socket_message(message, host='127.0.0.1'):
 
 if __name__ == '__main__':
 
-	if len(sys.argv) < 2:
+	if len(sys.argv) < 3:
 		print "Numero incorreto de argumentos" 
-		print "Execute novamente no formato: pysnmp.py oid [oid...]" 
+		print "Execute novamente no formato: pysnmp.py host oid [oid...]" 
 		exit(-1)
 
 
-	for oid_input in sys.argv[1:]:
+	for oid_input in sys.argv[2:]:
 
 		print "Enviando oid: " + str(oid_input)
 		oid = formata_oid(oid_input)
 		snmp_message = monta_snmp(oid)
 		print "SNMP Message: " + str(list(snmp_message))
-		result=send_socket_message(snmp_message)
+		result=send_socket_message(snmp_message, host=sys.argv[1])
 		desmonta_snmp(result)
